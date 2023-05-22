@@ -11,3 +11,24 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
 }
+
+@font-face {
+  font-family: 'Mod Aber Mono';
+  src: local('Mod Aber Mono'), 
+       url('./fonts/Mod-Aber-Mono-Regular.woff2') format('woff2'),
+       url('./fonts/Mod-Aber-Mono-Regular.woff') format('woff'),
+       url('./fonts/Mod-Aber-Mono-Regular.ttf') format('truetype'),
+       url('./fonts/Mod-Aber-Mono-Regular.otf') format('opentype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Mod Aber Mono';
+  src: local('Mod Aber Mono Bold'), 
+       url('./fonts/Mod-Aber-Mono-Bold.woff2') format('woff2'),
+       url('./fonts/Mod-Aber-Mono-Bold.woff') format('woff'),
+       url('./fonts/Mod-Aber-Mono-Bold.otf') format('opentype');
+  font-weight: bold;
+  font-style: normal;
+}
