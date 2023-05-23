@@ -131,7 +131,7 @@ bot.on('interactionCreate', (interaction) => __awaiter(void 0, void 0, void 0, f
     const buttonInteraction = interaction;
     const { customId } = buttonInteraction;
     if (customId === 'verify') {
-        yield buttonInteraction.reply({ content: 'Start the verification process by visiting: https://www.authenticator-dev.ferrumnetwork.io/discord-authentication', ephemeral: true });
+        yield buttonInteraction.reply({ content: `Start the verification process by visiting: ${DISCORD_REDIRECT_URL}`, ephemeral: true });
     }
 }));
 bot.login(TOKEN);
