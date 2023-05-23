@@ -7,6 +7,7 @@ import HeaderFullWidth from './HeaderFullWidth';
 const REACT_APP_DISCORD_CLIENT_ID = process.env.REACT_APP_DISCORD_CLIENT_ID;
 const REACT_APP_DISCORD_REDIRECT_URL = process.env.REACT_APP_DISCORD_REDIRECT_URL as string;
 const REACT_APP_BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
+const REACT_APP_DISCORD_BOT_API_URL = process.env.REACT_APP_DISCORD_BOT_API_URL;
 
 declare global {
     interface Window {
@@ -91,6 +92,35 @@ function DiscordAuthenticator() {
             if (data.isValid) {
                 setIsVerified(true);
                 setError(null);
+            
+                // Send the verification data to the Discord bot
+                try {
+                    const botResponse = await fetch(`${REACT_APP_DISCORD_BOT_API_URL}/authenticate`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({ code: authorizationCode, userAddress }),
+                    });
+            
+                    const botData = await botResponse.json();
+            
+                    if (botData.isValid) {
+                        // The bot successfully verified the user
+                    } else {
+                        // The bot could not verify the user
+                        setError(botData.message);
+                    }
+                } catch (err) {
+                    console.log(err);
+                    if (err instanceof Error) {
+                        setError(err.message);
+                    } else if (err && typeof err === 'object' && 'message' in err) {
+                        setError(err.message as string);
+                    } else {
+                        setError('Failed to verify with the bot');
+                    }
+                }
             } else {
                 setIsVerified(false);
                 setError(data.message);
