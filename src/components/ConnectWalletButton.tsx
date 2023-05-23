@@ -4,6 +4,8 @@ import Web3 from 'web3';
 import { AppBar, Box, Button, Container, Link, Paper, Toolbar, Typography } from '@mui/material';
 import HeaderFullWidth from './HeaderFullWidth';
 
+const REACT_APP_BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
+
 declare global {
     interface Window {
         ethereum: any;
@@ -58,7 +60,7 @@ function ConnectWalletButton() {
             console.log('Signature:', signature);
     
             // Send the nonce to the server as well.
-            const response = await fetch('http://localhost:8081/verify', {
+            const response = await fetch(`${REACT_APP_BACKEND_URL}/verify`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
