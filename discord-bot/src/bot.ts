@@ -127,7 +127,7 @@ bot.once('ready', () => {
                 .setStyle('PRIMARY'),
         );
 
-    channel.send({ content: 'To gain access to gated roles*, you need to verify your holdings.\n\nThis is a readonly bot and connection.\n\nThere are no transactions or fees associated with validation. To begin validation click the button below.\n\nThen Login with Discord (make sure you verify the URL).\n\nOnce that is done you will be directed to a page to connect and verify your wallet so the Ferrum Authenticator can assign you the appropriate gated role.', components: [row] });
+    channel.send({ content: 'To gain access to gated roles, you need to verify your holdings.\n\nThis is a readonly bot and connection.\n\nThere are no transactions or fees associated with validation. To begin validation click the button below.\n\nThen Login with Discord (make sure you verify the URL).\n\nOnce that is done you will be directed to a page to connect and verify your wallet so the Ferrum Authenticator can assign you the appropriate gated role.\n', components: [row] });
 });
 
 bot.on('interactionCreate', async (interaction) => {

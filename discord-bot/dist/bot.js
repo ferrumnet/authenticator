@@ -28,6 +28,7 @@ const DISCORD_REDIRECT_URL = process.env.DISCORD_REDIRECT_URL;
 const PORT = process.env.PORT;
 const DISCORD_SERVER_GUILD_ID = process.env.DISCORD_SERVER_GUILD_ID;
 const DISCORD_SERVER_GUILD_CHANNEL_ID = process.env.DISCORD_SERVER_GUILD_CHANNEL_ID;
+const DISCORD_SERVER_GUILD_BOT_CHANNEL_ID = process.env.DISCORD_SERVER_GUILD_BOT_CHANNEL_ID;
 console.log("Bot is starting...");
 const bot = new discord_js_1.Client({
     intents: [discord_js_1.Intents.FLAGS.GUILDS, discord_js_1.Intents.FLAGS.GUILD_MEMBERS, discord_js_1.Intents.FLAGS.GUILD_MESSAGES]
@@ -116,22 +117,21 @@ bot.once('ready', () => {
     var _a;
     console.log(`Logged in as ${(_a = bot.user) === null || _a === void 0 ? void 0 : _a.tag}!`);
     // ADD THIS CODE BELOW
-    const channel = bot.channels.cache.get(DISCORD_SERVER_GUILD_CHANNEL_ID);
+    const channel = bot.channels.cache.get(DISCORD_SERVER_GUILD_BOT_CHANNEL_ID);
     const row = new discord_js_1.MessageActionRow()
         .addComponents(new discord_js_1.MessageButton()
         .setCustomId('verify')
         .setLabel('Verify me')
         .setStyle('PRIMARY'));
-    channel.send({ content: 'Click the button below to start the verification process:', components: [row] });
+    channel.send({ content: 'To gain access to gated roles, you need to verify your holdings.\n\nThis is a readonly bot and connection.\n\nThere are no transactions or fees associated with validation. To begin validation click the button below.\n\nThen Login with Discord (make sure you verify the URL).\n\nOnce that is done you will be directed to a page to connect and verify your wallet so the Ferrum Authenticator can assign you the appropriate gated role.\n', components: [row] });
 });
 bot.on('interactionCreate', (interaction) => __awaiter(void 0, void 0, void 0, function* () {
     if (!interaction.isButton())
         return;
     const buttonInteraction = interaction;
-    const { customId, user } = buttonInteraction;
+    const { customId } = buttonInteraction;
     if (customId === 'verify') {
-        yield buttonInteraction.reply({ content: 'Check your direct messages for the link!', ephemeral: true });
-        yield user.send('Start the verification process by visiting: https://www.authenticator-dev.ferrumnetwork.io/discord-authentication');
+        yield buttonInteraction.reply({ content: 'Start the verification process by visiting: https://www.authenticator-dev.ferrumnetwork.io/discord-authentication', ephemeral: true });
     }
 }));
 bot.login(TOKEN);
