@@ -4,6 +4,7 @@ import CssBaseline from '@mui/material/CssBaseline';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import ConnectWalletButton from './components/ConnectWalletButton';
 import theme from './theme';
+import DiscordAuthenticator from './components/DiscordAuthenticator';
 
 function App() {
   return (
@@ -12,6 +13,7 @@ function App() {
       <Router>
         <Routes>
           <Route path="/" element={<ConnectWalletButton />} />
+          <Route path="/discord-authentication" element={<DiscordAuthenticator />} />
         </Routes>
       </Router>
     </ThemeProvider>
