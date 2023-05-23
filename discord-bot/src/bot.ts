@@ -74,7 +74,8 @@ app.post('/authenticate', async (req, res) => {
 
         const guild = bot.guilds.cache.get(DISCORD_SERVER_GUILD_ID!);
         const member = guild?.members.cache.get(user.id);
-        const role = guild?.roles.cache.find(role => role.name === "FRM Holder");
+        const roleFrmHolder = guild?.roles.cache.find(role => role.name === "FRM Holder");
+        const roleGovernanceComittee = guild?.roles.cache.find(role => role.name === "Governance Committee");
         // console.log(`Role: `, role);
 
         const channelId = DISCORD_SERVER_GUILD_CHANNEL_ID!;
@@ -87,9 +88,17 @@ app.post('/authenticate', async (req, res) => {
             console.log(`Snapshot balance: ${snapShotBalance}`); // New line
 
             if (snapShotBalance > 0) {
-                if (role && member) {
-                    await member.roles.add(role);
-                    await channel.send(`${user} has been assigned the ${role.name}`);
+                if (roleFrmHolder && member) {
+                    await member.roles.add(roleFrmHolder);
+                    await channel.send(`${user} has been assigned the ${roleFrmHolder.name}`);
+                } else {
+                    await channel.send(`Error: User ${user} not found or role "FRM Holder" not found.`);
+                }
+            } else if (snapShotBalance >= 450000) {
+                if (roleFrmHolder && roleGovernanceComittee && member) {
+                    await member.roles.add(roleFrmHolder);
+                    await member.roles.add(roleGovernanceComittee);
+                    await channel.send(`${user} has been assigned the ${roleFrmHolder.name} & ${roleGovernanceComittee.name} roles.`);
                 } else {
                     await channel.send(`Error: User ${user} not found or role "FRM Holder" not found.`);
                 }
