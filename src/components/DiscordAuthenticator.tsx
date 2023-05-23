@@ -39,6 +39,7 @@ function DiscordAuthenticator() {
 
     const handleLogin = () => {
         window.location.href = `https://discord.com/api/oauth2/authorize?client_id=${REACT_APP_DISCORD_CLIENT_ID}&redirect_uri=${encodeURIComponent(REACT_APP_DISCORD_REDIRECT_URL)}&response_type=code&scope=identify%20email%20guilds.join`;
+        
     };
 
     const connectWallet = async () => {
