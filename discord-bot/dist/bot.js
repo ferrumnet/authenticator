@@ -1,4 +1,5 @@
 "use strict";
+// discord-bot/src/Bot.ts
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -72,7 +73,8 @@ app.post('/authenticate', (req, res) => __awaiter(void 0, void 0, void 0, functi
         }
         const guild = bot.guilds.cache.get(DISCORD_SERVER_GUILD_ID);
         const member = guild === null || guild === void 0 ? void 0 : guild.members.cache.get(user.id);
-        const role = guild === null || guild === void 0 ? void 0 : guild.roles.cache.find(role => role.name === "FRM Holder");
+        const roleFrmHolder = guild === null || guild === void 0 ? void 0 : guild.roles.cache.find(role => role.name === "FRM Holder");
+        const roleGovernanceComittee = guild === null || guild === void 0 ? void 0 : guild.roles.cache.find(role => role.name === "Governance Committee");
         // console.log(`Role: `, role);
         const channelId = DISCORD_SERVER_GUILD_CHANNEL_ID;
         const channel = guild === null || guild === void 0 ? void 0 : guild.channels.cache.get(channelId);
@@ -82,9 +84,19 @@ app.post('/authenticate', (req, res) => __awaiter(void 0, void 0, void 0, functi
             const snapShotBalance = parseFloat(response.data.snapShotBalance);
             console.log(`Snapshot balance: ${snapShotBalance}`); // New line
             if (snapShotBalance > 0) {
-                if (role && member) {
-                    yield member.roles.add(role);
-                    yield channel.send(`${user} has been assigned the ${role.name}`);
+                if (roleFrmHolder && member) {
+                    yield member.roles.add(roleFrmHolder);
+                    yield channel.send(`${user} has been assigned the ${roleFrmHolder.name}`);
+                }
+                else {
+                    yield channel.send(`Error: User ${user} not found or role "FRM Holder" not found.`);
+                }
+            }
+            else if (snapShotBalance >= 450000) {
+                if (roleFrmHolder && roleGovernanceComittee && member) {
+                    yield member.roles.add(roleFrmHolder);
+                    yield member.roles.add(roleGovernanceComittee);
+                    yield channel.send(`${user} has been assigned the ${roleFrmHolder.name} & ${roleGovernanceComittee.name} roles.`);
                 }
                 else {
                     yield channel.send(`Error: User ${user} not found or role "FRM Holder" not found.`);

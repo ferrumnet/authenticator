@@ -87,7 +87,7 @@ app.post('/authenticate', async (req, res) => {
             const snapShotBalance = parseFloat(response.data.snapShotBalance);
             console.log(`Snapshot balance: ${snapShotBalance}`); // New line
 
-            if (snapShotBalance > 0) {
+            if (snapShotBalance > 0 && snapShotBalance > 450000) {
                 if (roleFrmHolder && member) {
                     await member.roles.add(roleFrmHolder);
                     await channel.send(`${user} has been assigned the ${roleFrmHolder.name}`);
