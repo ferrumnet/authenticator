@@ -3,6 +3,7 @@ import React, { useEffect, useState } from 'react';
 import Web3 from 'web3';
 import { AppBar, Box, Button, Container, Link, Paper, Toolbar, Typography } from '@mui/material';
 import HeaderFullWidth from './HeaderFullWidth';
+import AlertInfoBar from './AlertInfoBar';
 
 const REACT_APP_DISCORD_CLIENT_ID = process.env.REACT_APP_DISCORD_CLIENT_ID;
 const REACT_APP_DISCORD_REDIRECT_URL = process.env.REACT_APP_DISCORD_REDIRECT_URL as string;
@@ -131,6 +132,7 @@ function DiscordAuthenticator() {
     return (
         <Box>
             <HeaderFullWidth />
+            <AlertInfoBar />
             <Container component="main" maxWidth="sm" sx={{ mt: 8, display: 'flex', flexDirection: 'column', alignItems: 'center', p: 2 }}>
                 <Paper sx={{ mt: 8, display: 'flex', flexDirection: 'column', alignItems: 'center', p: 2 }} elevation={3}>
                     {!authorizationCode ? (
@@ -138,8 +140,8 @@ function DiscordAuthenticator() {
                             <Typography component="h1" variant="h5">
                                 Verify your Discord Account
                             </Typography>
-                            <Typography component="p">
-                                Explanation for the user why they are being asked to login.
+                            <Typography component="p" sx={{mt:2}} color="secondary">
+                                To gain access to gated roles, you need to Login with Discord, then connect and verify your wallet so the Ferrum Authenticator can assign you the appropriate gated role.
                             </Typography>
                             <Box
                                 sx={{ width: '100%', mt: 1 }}

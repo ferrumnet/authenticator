@@ -38,15 +38,6 @@ app.use(express_1.default.json());
 app.post('/authenticate', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { code, userAddress } = req.body;
     try {
-        // Use the code to get a Discord access token
-        // const tokenResponse = await axios.post('https://discord.com/api/oauth2/token', {
-        //     client_id: CLIENT_ID,
-        //     client_secret: CLIENT_SECRET,
-        //     grant_type: 'authorization_code',
-        //     code: code,
-        //     redirect_uri: DISCORD_REDIRECT_URL,
-        //     scope: 'identify'
-        // });
         const tokenResponse = yield axios_1.default.post('https://discord.com/api/oauth2/token', new URLSearchParams({
             client_id: CLIENT_ID,
             client_secret: CLIENT_SECRET,
@@ -121,39 +112,26 @@ app.post('/authenticate', (req, res) => __awaiter(void 0, void 0, void 0, functi
     }
 }));
 app.listen(PORT, () => console.log(`Bot server listening on port ${PORT}`));
-bot.login(TOKEN);
 bot.once('ready', () => {
     var _a;
     console.log(`Logged in as ${(_a = bot.user) === null || _a === void 0 ? void 0 : _a.tag}!`);
+    // ADD THIS CODE BELOW
+    const channel = bot.channels.cache.get(DISCORD_SERVER_GUILD_CHANNEL_ID);
+    const row = new discord_js_1.MessageActionRow()
+        .addComponents(new discord_js_1.MessageButton()
+        .setCustomId('verify')
+        .setLabel('Verify me')
+        .setStyle('PRIMARY'));
+    channel.send({ content: 'Click the button below to start the verification process:', components: [row] });
 });
-// bot.on('messageCreate', async (msg) => {
-//     console.log(`Received message: ${msg.content}`); // New line
-//     if (msg.content.startsWith('!verify')) {
-//         const args = msg.content.split(' ');
-//         const userAddress = args[1]; // Assumes user address is second argument
-//         console.log(`User address: ${userAddress}`); // New line
-//         if (!userAddress) {
-//             msg.reply('Please provide your wallet address.');
-//             return;
-//         }
-//         try {
-//             const response = await axios.get(`${API_URL_SNAP_HODL}/getSnapShotBySnapShotIdAndAddress/${SNAP_SHOT_ID}/${userAddress}`);
-//             const snapShotBalance = parseFloat(response.data.snapShotBalance);
-//             console.log(`Snapshot balance: ${snapShotBalance}`); // New line
-//             if (snapShotBalance > 0) {
-//                 const role = msg.guild?.roles.cache.find(role => role.name === "FRM Holder");
-//                 if (role) {
-//                     await msg.member?.roles.add(role);
-//                     msg.reply('You have been assigned the FRM Holder role.');
-//                 } else {
-//                     msg.reply('FRM Holder role not found.');
-//                 }
-//             } else {
-//                 msg.reply('Your snapshot balance is zero.');
-//             }
-//         } catch (error) {
-//             console.error('Error getting snapshot balance:', error);
-//             msg.reply('An error occurred while verifying your wallet.');
-//         }
-//     }
-// });
+bot.on('interactionCreate', (interaction) => __awaiter(void 0, void 0, void 0, function* () {
+    if (!interaction.isButton())
+        return;
+    const buttonInteraction = interaction;
+    const { customId, user } = buttonInteraction;
+    if (customId === 'verify') {
+        yield buttonInteraction.reply({ content: 'Check your direct messages for the link!', ephemeral: true });
+        yield user.send('Start the verification process by visiting: https://www.authenticator-dev.ferrumnetwork.io/discord-authentication');
+    }
+}));
+bot.login(TOKEN);

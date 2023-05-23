@@ -1,7 +1,7 @@
 // discord-bot/src/Bot.ts
 
 import dotenv from 'dotenv';
-import { Client, Intents, Message, Role, TextChannel } from "discord.js";
+import { Client, Intents, Message, Role, TextChannel, ButtonInteraction, MessageActionRow, MessageButton } from "discord.js";
 import axios from 'axios';
 import express from 'express';
 import cors from 'cors';
@@ -17,6 +17,7 @@ const DISCORD_REDIRECT_URL = process.env.DISCORD_REDIRECT_URL;
 const PORT = process.env.PORT;
 const DISCORD_SERVER_GUILD_ID = process.env.DISCORD_SERVER_GUILD_ID;
 const DISCORD_SERVER_GUILD_CHANNEL_ID = process.env.DISCORD_SERVER_GUILD_CHANNEL_ID;
+const DISCORD_SERVER_GUILD_BOT_CHANNEL_ID = process.env.DISCORD_SERVER_GUILD_BOT_CHANNEL_ID;
 
 console.log("Bot is starting...");
 
@@ -33,16 +34,6 @@ app.post('/authenticate', async (req, res) => {
     const { code, userAddress } = req.body;
 
     try {
-        // Use the code to get a Discord access token
-        // const tokenResponse = await axios.post('https://discord.com/api/oauth2/token', {
-        //     client_id: CLIENT_ID,
-        //     client_secret: CLIENT_SECRET,
-        //     grant_type: 'authorization_code',
-        //     code: code,
-        //     redirect_uri: DISCORD_REDIRECT_URL,
-        //     scope: 'identify'
-        // });
-
         const tokenResponse = await axios.post('https://discord.com/api/oauth2/token', new URLSearchParams({
             client_id: CLIENT_ID!,
             client_secret: CLIENT_SECRET!,
@@ -122,44 +113,33 @@ app.post('/authenticate', async (req, res) => {
 
 app.listen(PORT, () => console.log(`Bot server listening on port ${PORT}`));
 
-bot.login(TOKEN);
-
 bot.once('ready', () => {
     console.log(`Logged in as ${bot.user?.tag}!`);
+
+    // ADD THIS CODE BELOW
+    const channel = bot.channels.cache.get(DISCORD_SERVER_GUILD_BOT_CHANNEL_ID!) as TextChannel;
+
+    const row = new MessageActionRow()
+        .addComponents(
+            new MessageButton()
+                .setCustomId('verify')
+                .setLabel('Verify me')
+                .setStyle('PRIMARY'),
+        );
+
+    channel.send({ content: 'To gain access to gated roles*\n, you need to verify your holdings. This is a readonly bot and connection. There are no transactions or fees assosicated with validation. To begin validation click the button below. Then Login with Discord. Once that is done you will be directed to a page to connect and verify your wallet so the Ferrum Authenticator can assign you the appropriate gated role.', components: [row] });
 });
 
-// bot.on('messageCreate', async (msg) => {
-//     console.log(`Received message: ${msg.content}`); // New line
-//     if (msg.content.startsWith('!verify')) {
-//         const args = msg.content.split(' ');
-//         const userAddress = args[1]; // Assumes user address is second argument
-//         console.log(`User address: ${userAddress}`); // New line
+bot.on('interactionCreate', async (interaction) => {
+    if (!interaction.isButton()) return;
+    const buttonInteraction = interaction as ButtonInteraction;
 
-//         if (!userAddress) {
-//             msg.reply('Please provide your wallet address.');
-//             return;
-//         }
+    const { customId, user } = buttonInteraction;
 
-//         try {
-//             const response = await axios.get(`${API_URL_SNAP_HODL}/getSnapShotBySnapShotIdAndAddress/${SNAP_SHOT_ID}/${userAddress}`);
-//             const snapShotBalance = parseFloat(response.data.snapShotBalance);
-//             console.log(`Snapshot balance: ${snapShotBalance}`); // New line
+    if (customId === 'verify') {
+        await buttonInteraction.reply({ content: 'Check your direct messages for the link!', ephemeral: true });
+        await user.send('Start the verification process by visiting: https://www.authenticator-dev.ferrumnetwork.io/discord-authentication');
+    }
+});
 
-//             if (snapShotBalance > 0) {
-//                 const role = msg.guild?.roles.cache.find(role => role.name === "FRM Holder");
-//                 if (role) {
-//                     await msg.member?.roles.add(role);
-//                     msg.reply('You have been assigned the FRM Holder role.');
-//                 } else {
-//                     msg.reply('FRM Holder role not found.');
-//                 }
-//             } else {
-//                 msg.reply('Your snapshot balance is zero.');
-//             }
-
-//         } catch (error) {
-//             console.error('Error getting snapshot balance:', error);
-//             msg.reply('An error occurred while verifying your wallet.');
-//         }
-//     }
-// });
+bot.login(TOKEN);
