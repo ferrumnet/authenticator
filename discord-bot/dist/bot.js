@@ -88,11 +88,12 @@ app.post('/authenticate', (req, res) => __awaiter(void 0, void 0, void 0, functi
                 }
             }
             else if (snapShotBalance >= 450000) {
-                if (roleFrmHolder && roleGovernanceComittee && roleQualifiedVoterProposalCreator && member) {
+                if (roleFrmHolder && roleGovernanceComittee && roleQualifiedVoter && roleQualifiedVoterProposalCreator && member) {
                     yield member.roles.add(roleFrmHolder);
                     yield member.roles.add(roleGovernanceComittee);
+                    yield member.roles.add(roleQualifiedVoter);
                     yield member.roles.add(roleQualifiedVoterProposalCreator);
-                    yield channel.send(`${user} has been assigned the ${roleFrmHolder.name}, ${roleGovernanceComittee.name} & ${roleQualifiedVoterProposalCreator.name} roles.`);
+                    yield channel.send(`${user} has been assigned the ${roleFrmHolder.name}, ${roleGovernanceComittee.name}, ${roleQualifiedVoter}, & ${roleQualifiedVoterProposalCreator.name} roles.`);
                 }
                 else {
                     yield channel.send(`Error: User ${user} not found or role "FRM Holder" not found.`);
