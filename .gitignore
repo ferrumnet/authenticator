@@ -31,3 +31,4 @@ server/!.elasticbeanstalk/*.global.yml
 
 # Discord Bot
 discord-bot/.env
+discord-bot/node_modules
