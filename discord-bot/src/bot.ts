@@ -78,30 +78,27 @@ app.post('/authenticate', async (req, res) => {
         try {
             const response = await axios.get(`${API_URL_SNAP_HODL}/getSnapShotBySnapShotIdAndAddress/${SNAP_SHOT_ID}/${userAddress}`);
             const snapShotBalance = parseFloat(response.data.snapShotBalance);
-            console.log(`Snapshot balance: ${snapShotBalance}`); // New line
+            console.log(`Snapshot balance: ${snapShotBalance}`);
+
+            let rolesToAdd: Role[] = [];
+            let roleNames = '';
 
             if (snapShotBalance > 0 && snapShotBalance < 450000) {
-                if (roleFrmHolder && roleQualifiedVoter && member) {
-                    await member.roles.add(roleFrmHolder);
-                    await member.roles.add(roleQualifiedVoter);
-                    await channel.send(`${user} has been assigned the ${roleFrmHolder.name} & ${roleQualifiedVoter.name} roles`);
-                } else {
-                    await channel.send(`Error: User ${user} not found or role "FRM Holder" not found.`);
-                }
+                rolesToAdd = [roleFrmHolder, roleQualifiedVoter].filter(role => role !== undefined) as Role[];
+                roleNames = rolesToAdd.map(role => role.name).join(" & ");
             } else if (snapShotBalance >= 450000) {
-                if (roleFrmHolder && roleGovernanceComittee && roleQualifiedVoter && roleQualifiedVoterProposalCreator && member) {
-                    await member.roles.add(roleFrmHolder);
-                    await member.roles.add(roleGovernanceComittee);
-                    await member.roles.add(roleQualifiedVoter);
-                    await member.roles.add(roleQualifiedVoterProposalCreator);
-                    await channel.send(`${user} has been assigned the ${roleFrmHolder.name}, ${roleGovernanceComittee.name}, ${roleQualifiedVoter}, & ${roleQualifiedVoterProposalCreator.name} roles.`);
-                } else {
-                    await channel.send(`Error: User ${user} not found or role "FRM Holder" not found.`);
-                }
-            } else {
-                await channel.send(`User ${user} snapshot balance is zero.`);
+                rolesToAdd = [roleFrmHolder, roleGovernanceComittee, roleQualifiedVoter, roleQualifiedVoterProposalCreator].filter(role => role !== undefined) as Role[];
+                roleNames = rolesToAdd.map(role => role.name).join(", ");
             }
 
+            if (rolesToAdd.length > 0 && member) {
+                for (const role of rolesToAdd) {
+                    await member.roles.add(role);
+                }
+                await channel.send(`${user} has been assigned the ${roleNames} roles.`);
+            } else {
+                await channel.send(`Error: User ${user} not found or role "FRM Holder" not found.`);
+            }
         } catch (error) {
             console.error('Error getting snapshot balance:', error);
             await channel.send(`Error occurred while verifying user ${user}'s wallet.`);
