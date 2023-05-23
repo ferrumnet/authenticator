@@ -127,18 +127,17 @@ bot.once('ready', () => {
                 .setStyle('PRIMARY'),
         );
 
-    channel.send({ content: 'To gain access to gated roles*\n, you need to verify your holdings. This is a readonly bot and connection. There are no transactions or fees assosicated with validation. To begin validation click the button below. Then Login with Discord. Once that is done you will be directed to a page to connect and verify your wallet so the Ferrum Authenticator can assign you the appropriate gated role.', components: [row] });
+    channel.send({ content: 'To gain access to gated roles*, you need to verify your holdings.\n\nThis is a readonly bot and connection.\n\nThere are no transactions or fees associated with validation. To begin validation click the button below.\n\nThen Login with Discord (make sure you verify the URL).\n\nOnce that is done you will be directed to a page to connect and verify your wallet so the Ferrum Authenticator can assign you the appropriate gated role.', components: [row] });
 });
 
 bot.on('interactionCreate', async (interaction) => {
     if (!interaction.isButton()) return;
     const buttonInteraction = interaction as ButtonInteraction;
 
-    const { customId, user } = buttonInteraction;
+    const { customId } = buttonInteraction;
 
     if (customId === 'verify') {
-        await buttonInteraction.reply({ content: 'Check your direct messages for the link!', ephemeral: true });
-        await user.send('Start the verification process by visiting: https://www.authenticator-dev.ferrumnetwork.io/discord-authentication');
+        await buttonInteraction.reply({ content: 'Start the verification process by visiting: https://www.authenticator-dev.ferrumnetwork.io/discord-authentication', ephemeral: true });
     }
 });
 
