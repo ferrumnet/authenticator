@@ -89,9 +89,10 @@ app.post('/authenticate', async (req, res) => {
                     await channel.send(`Error: User ${user} not found or role "FRM Holder" not found.`);
                 }
             } else if (snapShotBalance >= 450000) {
-                if (roleFrmHolder && roleGovernanceComittee && roleQualifiedVoterProposalCreator && member) {
+                if (roleFrmHolder && roleGovernanceComittee && roleQualifiedVoter && roleQualifiedVoterProposalCreator && member) {
                     await member.roles.add(roleFrmHolder);
                     await member.roles.add(roleGovernanceComittee);
+                    await member.roles.add(roleQualifiedVoter);
                     await member.roles.add(roleQualifiedVoterProposalCreator);
                     await channel.send(`${user} has been assigned the ${roleFrmHolder.name}, ${roleGovernanceComittee.name} & ${roleQualifiedVoterProposalCreator.name} roles.`);
                 } else {
