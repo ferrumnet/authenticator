@@ -28,3 +28,6 @@ yarn-error.log*
 server/.elasticbeanstalk/*
 server/!.elasticbeanstalk/*.cfg.yml
 server/!.elasticbeanstalk/*.global.yml
+
+# Discord Bot
+discord-bot/.env
