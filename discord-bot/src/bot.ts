@@ -1,3 +1,5 @@
+// discord-bot/src/Bot.ts
+
 import dotenv from 'dotenv';
 import { Client, Intents, Message, Role, TextChannel } from "discord.js";
 import axios from 'axios';
