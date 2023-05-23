@@ -75,7 +75,9 @@ app.post('/authenticate', async (req, res) => {
         const guild = bot.guilds.cache.get(DISCORD_SERVER_GUILD_ID!);
         const member = guild?.members.cache.get(user.id);
         const roleFrmHolder = guild?.roles.cache.find(role => role.name === "FRM Holder");
+        const roleQualifiedVoter = guild?.roles.cache.find(role => role.name === "Qualified Voter");
         const roleGovernanceComittee = guild?.roles.cache.find(role => role.name === "Governance Committee");
+        const roleQualifiedVoterProposalCreator = guild?.roles.cache.find(role => role.name === "Qualified Proposal Creator");
         // console.log(`Role: `, role);
 
         const channelId = DISCORD_SERVER_GUILD_CHANNEL_ID!;
@@ -87,18 +89,20 @@ app.post('/authenticate', async (req, res) => {
             const snapShotBalance = parseFloat(response.data.snapShotBalance);
             console.log(`Snapshot balance: ${snapShotBalance}`); // New line
 
-            if (snapShotBalance > 0 && snapShotBalance > 450000) {
-                if (roleFrmHolder && member) {
+            if (snapShotBalance > 0 && snapShotBalance < 450000) {
+                if (roleFrmHolder && roleQualifiedVoter && member) {
                     await member.roles.add(roleFrmHolder);
-                    await channel.send(`${user} has been assigned the ${roleFrmHolder.name}`);
+                    await member.roles.add(roleQualifiedVoter);
+                    await channel.send(`${user} has been assigned the ${roleFrmHolder.name} & ${roleQualifiedVoter.name} roles`);
                 } else {
                     await channel.send(`Error: User ${user} not found or role "FRM Holder" not found.`);
                 }
             } else if (snapShotBalance >= 450000) {
-                if (roleFrmHolder && roleGovernanceComittee && member) {
+                if (roleFrmHolder && roleGovernanceComittee && roleQualifiedVoterProposalCreator && member) {
                     await member.roles.add(roleFrmHolder);
                     await member.roles.add(roleGovernanceComittee);
-                    await channel.send(`${user} has been assigned the ${roleFrmHolder.name} & ${roleGovernanceComittee.name} roles.`);
+                    await member.roles.add(roleQualifiedVoterProposalCreator);
+                    await channel.send(`${user} has been assigned the ${roleFrmHolder.name}, ${roleGovernanceComittee.name} & ${roleQualifiedVoterProposalCreator.name} roles.`);
                 } else {
                     await channel.send(`Error: User ${user} not found or role "FRM Holder" not found.`);
                 }

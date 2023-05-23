@@ -74,7 +74,9 @@ app.post('/authenticate', (req, res) => __awaiter(void 0, void 0, void 0, functi
         const guild = bot.guilds.cache.get(DISCORD_SERVER_GUILD_ID);
         const member = guild === null || guild === void 0 ? void 0 : guild.members.cache.get(user.id);
         const roleFrmHolder = guild === null || guild === void 0 ? void 0 : guild.roles.cache.find(role => role.name === "FRM Holder");
+        const roleQualifiedVoter = guild === null || guild === void 0 ? void 0 : guild.roles.cache.find(role => role.name === "Qualified Voter");
         const roleGovernanceComittee = guild === null || guild === void 0 ? void 0 : guild.roles.cache.find(role => role.name === "Governance Committee");
+        const roleQualifiedVoterProposalCreator = guild === null || guild === void 0 ? void 0 : guild.roles.cache.find(role => role.name === "Qualified Proposal Creator");
         // console.log(`Role: `, role);
         const channelId = DISCORD_SERVER_GUILD_CHANNEL_ID;
         const channel = guild === null || guild === void 0 ? void 0 : guild.channels.cache.get(channelId);
@@ -83,20 +85,22 @@ app.post('/authenticate', (req, res) => __awaiter(void 0, void 0, void 0, functi
             const response = yield axios_1.default.get(`${API_URL_SNAP_HODL}/getSnapShotBySnapShotIdAndAddress/${SNAP_SHOT_ID}/${userAddress}`);
             const snapShotBalance = parseFloat(response.data.snapShotBalance);
             console.log(`Snapshot balance: ${snapShotBalance}`); // New line
-            if (snapShotBalance > 0) {
-                if (roleFrmHolder && member) {
+            if (snapShotBalance > 0 && snapShotBalance < 450000) {
+                if (roleFrmHolder && roleQualifiedVoter && member) {
                     yield member.roles.add(roleFrmHolder);
-                    yield channel.send(`${user} has been assigned the ${roleFrmHolder.name}`);
+                    yield member.roles.add(roleQualifiedVoter);
+                    yield channel.send(`${user} has been assigned the ${roleFrmHolder.name} & ${roleQualifiedVoter.name} roles`);
                 }
                 else {
                     yield channel.send(`Error: User ${user} not found or role "FRM Holder" not found.`);
                 }
             }
             else if (snapShotBalance >= 450000) {
-                if (roleFrmHolder && roleGovernanceComittee && member) {
+                if (roleFrmHolder && roleGovernanceComittee && roleQualifiedVoterProposalCreator && member) {
                     yield member.roles.add(roleFrmHolder);
                     yield member.roles.add(roleGovernanceComittee);
-                    yield channel.send(`${user} has been assigned the ${roleFrmHolder.name} & ${roleGovernanceComittee.name} roles.`);
+                    yield member.roles.add(roleQualifiedVoterProposalCreator);
+                    yield channel.send(`${user} has been assigned the ${roleFrmHolder.name}, ${roleGovernanceComittee.name} & ${roleQualifiedVoterProposalCreator.name} roles.`);
                 }
                 else {
                     yield channel.send(`Error: User ${user} not found or role "FRM Holder" not found.`);
