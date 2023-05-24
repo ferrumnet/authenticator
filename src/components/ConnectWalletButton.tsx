@@ -4,6 +4,8 @@ import Web3 from 'web3';
 import { AppBar, Box, Button, Container, Link, Paper, Toolbar, Typography } from '@mui/material';
 import HeaderFullWidth from './HeaderFullWidth';
 
+const REACT_APP_BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
+
 declare global {
     interface Window {
         ethereum: any;
@@ -13,6 +15,7 @@ declare global {
 function ConnectWalletButton() {
     const [userAddress, setUserAddress] = useState<string | null>(null);
     const [error, setError] = useState<string | null>(null);
+    const [isVerified, setIsVerified] = useState<boolean>(false);
 
     useEffect(() => {
         if (window.ethereum) {
@@ -44,6 +47,40 @@ function ConnectWalletButton() {
         }
     }
 
+    const signMessage = async () => {
+        if (window.ethereum && userAddress) {
+            const web3 = new Web3(window.ethereum);
+    
+            // Generate a random nonce.
+            const nonce = Math.floor(Math.random() * 1e16); // or use any other method you like
+    
+            const message = `Please sign this message to confirm your address. Nonce: ${nonce}`;
+    
+            const signature = await web3.eth.personal.sign(message, userAddress, '');
+            console.log('Signature:', signature);
+    
+            // Send the nonce to the server as well.
+            const response = await fetch(`${REACT_APP_BACKEND_URL}/verify`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ signature, message, userAddress, nonce }),
+            });
+    
+            const data = await response.json();
+            console.log(data);
+    
+            if (data.isValid) {
+                setIsVerified(true);
+                setError(null);
+            } else {
+                setIsVerified(false);
+                setError(data.message);
+            }
+        }
+    };    
+
     return (
         <Box>
             <HeaderFullWidth />
@@ -55,17 +92,30 @@ function ConnectWalletButton() {
                     <Box
                         sx={{ width: '100%', mt: 1 }}
                     >
-                        <Button
-                            onClick={connectWallet}
-                            fullWidth
-                            variant="contained"
-                            color="primary"
-                            sx={{ mt: 3, mb: 2 }}
-                        >
-                            Connect Wallet
-                        </Button>
+                        {!userAddress ? (
+                            <Button
+                                onClick={connectWallet}
+                                fullWidth
+                                variant="contained"
+                                color="primary"
+                                sx={{ mt: 3, mb: 2 }}
+                            >
+                                Connect Wallet
+                            </Button>
+                        ) : (
+                            <Button
+                                onClick={signMessage}
+                                fullWidth
+                                variant="contained"
+                                color="secondary"
+                                sx={{ mt: 3, mb: 2 }}
+                            >
+                                Verify Address by Signature
+                            </Button>
+                        )}
                         {error && <Typography color="error">{error}</Typography>}
                         {userAddress && <Typography>Connected account: {userAddress}</Typography>}
+                        {isVerified && <Typography color="success.main">Address has been successfully verified!</Typography>}
                     </Box>
                 </Paper>
             </Container>
