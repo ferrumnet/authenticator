@@ -26,10 +26,12 @@ const getQueryParam = (name: string, url: string) => {
 function DiscordAuthenticator() {
     const [authorizationCode, setAuthorizationCode] = useState<string | null>(
         getQueryParam('code', window.location.href)
-    );    
+    );
     const [userAddress, setUserAddress] = useState<string | null>(null);
     const [error, setError] = useState<string | null>(null);
     const [isVerified, setIsVerified] = useState<boolean>(false);
+    const [successMessage, setSuccessMessage] = useState<string | null>(null);
+
 
     useEffect(() => {
         if (window.ethereum) {
@@ -41,7 +43,7 @@ function DiscordAuthenticator() {
 
     const handleLogin = () => {
         window.location.href = `https://discord.com/api/oauth2/authorize?client_id=${REACT_APP_DISCORD_CLIENT_ID}&redirect_uri=${encodeURIComponent(REACT_APP_DISCORD_REDIRECT_URL)}&response_type=code&scope=identify%20email%20guilds.join`;
-        
+
     };
 
     const connectWallet = async () => {
@@ -69,15 +71,15 @@ function DiscordAuthenticator() {
     const signMessage = async () => {
         if (window.ethereum && userAddress && authorizationCode) {
             const web3 = new Web3(window.ethereum);
-    
+
             // Generate a random nonce.
             const nonce = Math.floor(Math.random() * 1e16); // or use any other method you like
-    
+
             const message = `Please sign this message to confirm your address. Nonce: ${nonce}`;
-    
+
             const signature = await web3.eth.personal.sign(message, userAddress, '');
             console.log('Signature:', signature);
-    
+
             // Send the nonce to the server as well.
             const response = await fetch(`${REACT_APP_BACKEND_URL}/verify`, {
                 method: 'POST',
@@ -93,7 +95,7 @@ function DiscordAuthenticator() {
             if (data.isValid) {
                 setIsVerified(true);
                 setError(null);
-            
+
                 // Send the verification data to the Discord bot
                 try {
                     const botResponse = await fetch(`${REACT_APP_DISCORD_BOT_API_URL}/authenticate`, {
@@ -103,11 +105,14 @@ function DiscordAuthenticator() {
                         },
                         body: JSON.stringify({ code: authorizationCode, userAddress }),
                     });
-            
+
                     const botData = await botResponse.json();
-            
+
+                    // Inside the botData.isValid condition
                     if (botData.isValid) {
                         // The bot successfully verified the user
+                        console.log(botData); // console log the botData
+                        setSuccessMessage("Your account has been verified, return to Discord to check your role in the #feed channel.");
                     } else {
                         // The bot could not verify the user
                         setError(botData.message);
@@ -127,7 +132,7 @@ function DiscordAuthenticator() {
                 setError(data.message);
             }
         }
-    };    
+    };
 
     return (
         <Box>
@@ -140,7 +145,7 @@ function DiscordAuthenticator() {
                             <Typography component="h1" variant="h5">
                                 Verify your Discord Account
                             </Typography>
-                            <Typography component="p" sx={{mt:2}} color="secondary">
+                            <Typography component="p" sx={{ mt: 2 }} color="secondary">
                                 To gain access to gated roles, you need to Login with Discord, then connect and verify your wallet so the Ferrum Authenticator can assign you the appropriate gated role.
                             </Typography>
                             <Box
@@ -187,6 +192,7 @@ function DiscordAuthenticator() {
                                     </Button>
                                 )}
                                 {error && <Typography color="error">{error}</Typography>}
+                                {successMessage && <Typography color="success.main">{successMessage}</Typography>}
                                 {userAddress && <Typography>Connected account: {userAddress}</Typography>}
                                 {isVerified && <Typography color="success.main">Address has been successfully verified!</Typography>}
                             </Box>
