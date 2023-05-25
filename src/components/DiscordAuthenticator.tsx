@@ -90,7 +90,7 @@ function DiscordAuthenticator() {
             });
 
             const data = await response.json();
-            console.log(data);
+            // console.log(data);
 
             if (data.isValid) {
                 setIsVerified(true);
@@ -107,12 +107,12 @@ function DiscordAuthenticator() {
                     });
 
                     const botData = await botResponse.json();
-                    console.log(botData);
+                    // console.log(botData);
 
                     // Inside the botData.isValid condition
                     if (botData.isValid) {
                         // The bot successfully verified the user
-                        console.log(botData); // console log the botData
+                        // console.log(botData); // console log the botData
                         setSuccessMessage("Your account has been verified, return to Discord to check your role in the #feed channel.");
                     } else {
                         // The bot could not verify the user
@@ -195,7 +195,7 @@ function DiscordAuthenticator() {
                                 {error && <Typography color="error">{error}</Typography>}
                                 {successMessage && <Typography color="success.main">{successMessage}</Typography>}
                                 {userAddress && <Typography>Connected account: {userAddress}</Typography>}
-                                {isVerified && <Typography color="success.main">Address has been successfully verified!</Typography>}
+                                {isVerified && <Typography color="success.main">Your Address has been verified, return to Discord to check your role in the #feed channel.</Typography>}
                             </Box>
                         </>
                     )}
