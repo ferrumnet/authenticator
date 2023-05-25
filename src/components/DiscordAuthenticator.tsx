@@ -107,6 +107,7 @@ function DiscordAuthenticator() {
                     });
 
                     const botData = await botResponse.json();
+                    console.log(botData);
 
                     // Inside the botData.isValid condition
                     if (botData.isValid) {
